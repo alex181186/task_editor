@@ -22,8 +22,10 @@ const periodOfTime = {
   'month': 30 * 1000 * 60 * 60 * 24
 }
 
-const saveFile = async (task, category) => {
-  const json = await JSON.stringify(task)
+const statusEnableList = ['done', 'new', 'in progress', 'blocked']
+
+const saveFile = async (tasks, category) => {
+  const json = await JSON.stringify(tasks)
   const pathFile = `../tasks/${category}.json`
   await writeFile(pathFile, json, { encoding: 'utf8' })
 }
@@ -64,6 +66,14 @@ const getTasks = async (category) => {
     .catch((err) => {
       console.log(err)
     })
+}
+
+const getTaskById = (tasks, id) => {
+  tasks.filter((task) => {
+    if (task.id === id) {
+      return task
+    }
+  })
 }
 
 const saveTasks = async (category, task) => {
@@ -152,6 +162,27 @@ server.get('/api/v1/tasks/:category', async (req, res) => {
   const tasksUndeleted = await getTaskUndeleted(tasks)
   res.send(tasksUndeleted)
 })
+
+server.patch('/api/v1/tasks/:category/:id', async (req, res) => {
+  const body = await req.body
+  const status = await body.status
+  if (!statusEnableList.includes(status)) {
+    res.status(501)
+    res.send({"status" :"error", "message": "incorrect status"})
+  }
+  const { category, id } = await req.params
+  const tasks = await getTasks(category)
+  const task = await getTaskById(tasks, id)
+  if (typeof task === 'undefined') {
+    res.status(501)
+    res.send({"status" :"error", "message": "incorrect id"})
+  }
+  const taskUpdateStatus = task.status = status
+  const tasksUpdate = await [...tasks, ...taskUpdateStatus]
+  await saveFile(tasksUpdate, category)
+  res.send(task)
+})
+
 
 
 server.use('/api/', (req, res) => {
