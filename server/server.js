@@ -12,7 +12,7 @@ import Html from '../client/html'
 
 const shortid = require('shortid')
 
-const { readFile, writeFile } = require('fs').promises
+const { readFile, writeFile, readdir } = require('fs').promises
 
 const Root = () => ''
 
@@ -23,6 +23,16 @@ const periodOfTime = {
 }
 
 const statusEnableList = ['done', 'new', 'in progress', 'blocked']
+
+
+const getDirFileName = async () => {
+  const filesName = await readdir('../tasks/')
+  .then((files) => {
+    const fileName = files.map((name) => name.split('.').slice(0, -1).join('.'))
+    return fileName
+  })
+  return filesName
+}
 
 const saveFile = async (tasks, category) => {
   const json = await JSON.stringify(tasks)
@@ -68,13 +78,36 @@ const getTasks = async (category) => {
     })
 }
 
-const getTaskById = (tasks, id) => {
-  tasks.filter((task) => {
-    if (task.id === id) {
+const getNewTaskById = (tasks, id) => {
+  const taskID = tasks.filter((task) => {
+    if (task.taskId === id) {
       return task
     }
   })
+  return taskID[0]
 }
+
+const setStatusTask = (tasks, id, status) => {
+  const upTasks = tasks.map((task) => {
+    if (task.taskId === id){
+      task.status = status
+    }
+    return task
+  })
+  return upTasks
+}
+
+const setDeleteTask = (tasks, id) => {
+  const upTasks = tasks.map((task) => {
+    if (task.taskId === id){
+      task._isDeleted = true
+    }
+    return task
+  })
+  return upTasks
+}
+
+
 
 const saveTasks = async (category, task) => {
   return readFile(`../tasks/${category}.json`, { encoding: 'utf8' })
@@ -169,21 +202,34 @@ server.patch('/api/v1/tasks/:category/:id', async (req, res) => {
   if (!statusEnableList.includes(status)) {
     res.status(501)
     res.send({"status" :"error", "message": "incorrect status"})
+    return
   }
   const { category, id } = await req.params
   const tasks = await getTasks(category)
-  const task = await getTaskById(tasks, id)
+  const upTasks = setStatusTask(tasks, id, status)
+  const task = await getNewTaskById(upTasks, id)
   if (typeof task === 'undefined') {
     res.status(501)
     res.send({"status" :"error", "message": "incorrect id"})
+    return
   }
-  const taskUpdateStatus = task.status = status
-  const tasksUpdate = await [...tasks, ...taskUpdateStatus]
-  await saveFile(tasksUpdate, category)
+  await saveFile(upTasks, category)
   res.send(task)
 })
 
+server.delete('/api/v1/tasks/:category/:id', async (req, res) => {
+  const { category, id } = await req.params
+  const tasks = await getTasks(category)
+  const upTasks = await setDeleteTask(tasks, id)
+  await saveFile(upTasks, category)
+  res.status(200)
+  res.end()
+})
 
+server.get('/api/v1/categories', async (req, res) => {
+  const filesName = await getDirFileName()
+  res.send(filesName)
+})
 
 server.use('/api/', (req, res) => {
   res.status(404)
