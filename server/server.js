@@ -16,18 +16,32 @@ const { readFile, writeFile, readdir } = require('fs').promises
 
 const Root = () => ''
 
+/*
+newTask.status = 'new'
+  newTask['_isDeleted'] = false
+  newTask['_createdAt'] = +new Date()
+  newTask['_deletedAt'] = null
+
+class Task {
+  constructor() {
+    this.status = 'new'
+  }
+  this
+}
+132:11  error    ["_createdAt"] is better written in dot notation  dot-notation
+133:3   error    Unexpected dangling '_' in '_deletedAt'  
+*/
+
 const periodOfTime = {
-  'day': 1000 * 60 * 60 * 24,
-  'week': 7 * 1000 * 60 * 60 * 24,
-  'month': 30 * 1000 * 60 * 60 * 24
+  day: 1000 * 60 * 60 * 24,
+  week: 7 * 1000 * 60 * 60 * 24,
+  month: 30 * 1000 * 60 * 60 * 24
 }
 
 const statusEnableList = ['done', 'new', 'in progress', 'blocked']
 
-
 const getDirFileName = async () => {
-  const filesName = await readdir('../tasks/')
-  .then((files) => {
+  const filesName = await readdir('../tasks/').then((files) => {
     const fileName = files.map((name) => name.split('.').slice(0, -1).join('.'))
     return fileName
   })
@@ -42,13 +56,15 @@ const saveFile = async (tasks, category) => {
 
 const getTaskUndeleted = (tasks) => {
   const tasksUndeleted = tasks.reduce((acc, task) => {
-    if (!task._isDeleted) {
-      delete task._createdAt
-      delete task._isDeleted
-      delete task._deletedAt
-      acc = [...acc, task]
-      return acc
+    const newTask = task
+    if (!task['_isDeleted']) {
+      delete newTask['_createdAt']
+      delete newTask['_isDeleted']
+      delete newTask['_deletedAt']
+      const returnTask = [...acc, newTask]
+      return returnTask
     }
+    return undefined
   }, [])
   return tasksUndeleted
 }
@@ -59,13 +75,13 @@ const getTaskTimespan = (tasks, timespanReq) => {
     return []
   }
   const tasksTimespan = tasks.filter((task) => {
-    if ( +new Date() - task._createdAt < timespan) {
+    if (+new Date() - task['_createdAt'] < timespan) {
       return task
     }
+    return undefined
   })
   return tasksTimespan
 }
-
 
 const getTasks = async (category) => {
   return readFile(`../tasks/${category}.json`, { encoding: 'utf8' })
@@ -83,41 +99,49 @@ const getNewTaskById = (tasks, id) => {
     if (task.taskId === id) {
       return task
     }
+    return undefined
   })
   return taskID[0]
 }
 
 const setStatusTask = (tasks, id, status) => {
   const upTasks = tasks.map((task) => {
-    if (task.taskId === id){
-      task.status = status
+    const newTask = task
+    if (task.taskId === id) {
+      newTask.status = status
     }
-    return task
+    return newTask
   })
   return upTasks
 }
 
 const setDeleteTask = (tasks, id) => {
   const upTasks = tasks.map((task) => {
-    if (task.taskId === id){
-      task._isDeleted = true
+    const newTask = task
+    if (task.taskId === id) {
+      newTask['_isDeleted'] = true
     }
-    return task
+    return newTask
   })
   return upTasks
 }
 
-
-
 const saveTasks = async (category, task) => {
+  // const fullTask = {...task, ['_isDeleted']: false, [status]: 'new', ['_createdAt']: +new Date(), ['_deletedAt']: null}
+  const newTask = task
+  newTask.status = 'new'
+  newTask['_isDeleted'] = false
+  newTask['_createdAt'] = +new Date()
+  newTask['_deletedAt'] = null
+
   return readFile(`../tasks/${category}.json`, { encoding: 'utf8' })
-    .then( async (text) => {
-      task['status'] = 'new'
-      task['_isDeleted'] = false
-      task['_createdAt'] = +new Date()
-      task['_deletedAt'] = null
+    .then(async (text) => {
+      // task.status = 'new'
+      // task['_isDeleted'] = false
+      // task['_createdAt'] = +new Date()
+      // task['_deletedAt'] = null
       const textJSON = await JSON.parse(text)
-      const tasks = await [ ...textJSON, task ]
+      const tasks = await [...textJSON, newTask]
       await saveFile(tasks, category)
       // return JSON.parse(text)
       return tasks
@@ -135,8 +159,6 @@ const saveTasks = async (category, task) => {
       return new_task
     })
 }
-
-
 
 try {
   // eslint-disable-next-line import/no-unresolved
@@ -167,17 +189,17 @@ const middleware = [
 
 middleware.forEach((it) => server.use(it))
 
-
-
+/*
 server.get('/api/v1/tasks', (req) => {
   const task = req.body
 })
+*/
 
 server.post('/api/v1/tasks/:category', async (req, res) => {
   const { category } = await req.params
   const task = await req.body
   await saveTasks(category, task)
-  res.json({ status: 'success'})
+  res.json({ status: 'success' })
 })
 
 server.get('/api/v1/tasks/:category/:timespan', async (req, res) => {
@@ -201,7 +223,7 @@ server.patch('/api/v1/tasks/:category/:id', async (req, res) => {
   const status = await body.status
   if (!statusEnableList.includes(status)) {
     res.status(501)
-    res.send({"status" :"error", "message": "incorrect status"})
+    res.send({ status: 'error', message: 'incorrect status' })
     return
   }
   const { category, id } = await req.params
@@ -210,7 +232,7 @@ server.patch('/api/v1/tasks/:category/:id', async (req, res) => {
   const task = await getNewTaskById(upTasks, id)
   if (typeof task === 'undefined') {
     res.status(501)
-    res.send({"status" :"error", "message": "incorrect id"})
+    res.send({ status: 'error', message: 'incorrect id' })
     return
   }
   await saveFile(upTasks, category)
