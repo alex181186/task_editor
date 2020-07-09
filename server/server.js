@@ -273,7 +273,6 @@ server.get('/', (req, res) => {
   })
 })
 
-/*
 server.get('/*', (req, res) => {
   const initialState = {
     location: req.url
@@ -286,7 +285,6 @@ server.get('/*', (req, res) => {
     })
   )
 })
-*/
 
 const app = server.listen(port)
 

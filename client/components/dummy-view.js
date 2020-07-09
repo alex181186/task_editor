@@ -2,6 +2,7 @@ import React from 'react'
 import Head from './head'
 
 const Dummy = () => {
+  console.log('Dummy-view')
   return (
     <div>
       <Head title="Hello" />

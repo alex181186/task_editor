@@ -1,22 +1,28 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { Switch, Route } from 'react-router-dom'
 import Head from './head'
+import Category from './category'
+import IndexComponent from './index'
 // import wave from '../assets/images/wave.jpg'
 
 const Home = () => {
-  const [counter, setCounterNew] = useState(0)
 
   return (
     <div>
       <Head title="Hello" />
-      <img alt="wave" src="images/wave.jpg" />
-      <button type="button" onClick={() => setCounterNew(counter + 1)}>
-        updateCounter
-      </button>
-      <div> Hello World Dashboard {counter} </div>
+      <div className="flex items-center justify-center h-screen">
+        <div className="bg-indigo-800 text-white font-bold rounded-lg border shadow-lg p-10">
+          <Switch>
+            {/* add your routes here */}
+            <Route exact path="/" component={() => <IndexComponent />} />
+            <Route exact path="/:category" component={() => <Category />} />
+          </Switch>
+        </div>
+      </div>
     </div>
   )
 }
 
 Home.propTypes = {}
 
-export default Home
+export default React.memo(Home)
