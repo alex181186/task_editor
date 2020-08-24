@@ -9,8 +9,17 @@ const Category = () => {
   const { category } = useParams()
   // const [tasksTitle, setTasksTitle] = useState([])
   const [tasks, setTasks] = useState([])
-  const [newTask, setNewTask] = useState([])
+  const [newTask, setNewTask] = useState('')
   // get data from api
+
+
+  useEffect( async() => {
+    console.log('newTask: ', newTask)
+    const status = await axios.post(`/api/v1/tasks/${category}`, {'title': newTask})
+    console.log('status: ', status)
+  }, [newTask, category])
+
+
   useEffect( async() => {
     const tasksGetting = await axios.get(`/api/v1/tasks/${category}`)
       .then(({ data }) => data)
@@ -33,7 +42,7 @@ const Category = () => {
           </div>
         </div>
 
-        <AddTask setNewTask={setNewTask}/>
+        <AddTask setNewTask={setNewTask} category={category}/>
 
         <div className="task-info">
           {tasks.map( task => {
@@ -42,6 +51,7 @@ const Category = () => {
           
 
         </div>
+        <div>{newTask}</div>
       </div>
     </div>
   )

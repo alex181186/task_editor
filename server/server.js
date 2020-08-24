@@ -198,6 +198,7 @@ server.get('/api/v1/tasks', (req) => {
 server.post('/api/v1/tasks/:category', async (req, res) => {
   const { category } = await req.params
   const task = await req.body
+  console.log('task_server: ', task)
   await saveTasks(category, task)
   res.json({ status: 'success' })
 })
@@ -260,7 +261,7 @@ server.use('/api/', (req, res) => {
 
 const [htmlStart, htmlEnd] = Html({
   body: 'separator',
-  title: 'Skillcrucial - Become an IT HERO'
+  title: 'Tasks meneger'
 }).split('separator')
 
 server.get('/', (req, res) => {
