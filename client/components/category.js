@@ -10,29 +10,33 @@ const Category = () => {
   // const [tasksTitle, setTasksTitle] = useState([])
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState('')
-  // get data from api
+  const [statusPost, setStatusPost] = useState('')
+  
+  async function fetchComment(nTask, naskCategory) {
+    // You can await here
+    if (nTask) {
+      await axios.post(`/api/v1/tasks/${naskCategory}`, {'title': nTask})
+        .then(res => console.log(res))
+        .catch(err => console.log(err))
+      await setStatusPost(nTask)
+      }
+  }
 
-
-  useEffect( async() => {
-    console.log('newTask: ', newTask)
-    const status = await axios.post(`/api/v1/tasks/${category}`, {'title': newTask})
-    console.log('status: ', status)
-  }, [newTask, category])
-
-
-  useEffect( async() => {
-    const tasksGetting = await axios.get(`/api/v1/tasks/${category}`)
+  async function fetchTasks(naskCategory) {
+    const tasksGetting = await axios.get(`/api/v1/tasks/${naskCategory}`)
       .then(({ data }) => data)
-    /*
-    const tasksTitleArr = tasks.reduce((acc, rec) => {
-      return [...acc, rec.title]
-    }, [])
-    setTasksTitle(tasksTitleArr)
-    */
-    setTasks(tasksGetting)
-    console.log('tasks: ', tasks)
-  }, [category])
-  // console.log('tasksTitle: ', tasksTitle)
+    await  setTasks(tasksGetting)
+  }
+
+  useEffect( () => {
+    fetchComment(newTask, category)
+  }, [newTask])
+  
+
+  useEffect( () => {
+    fetchTasks(category)
+  }, [category, statusPost])
+
   return (
     <div className="category">
       <div className="content">
@@ -41,21 +45,15 @@ const Category = () => {
             <div className="content__category-name text-center text-xl">Task category: {category}</div>
           </div>
         </div>
-
         <AddTask setNewTask={setNewTask} category={category}/>
-
         <div className="task-info">
           {tasks.map( task => {
             return <Task key={task.taskId} title={task.title} taskId={task.taskId} />
           })}
-          
-
         </div>
-        <div>{newTask}</div>
       </div>
     </div>
   )
 }
 
-// <div>{tasks}</div>
 export default Category

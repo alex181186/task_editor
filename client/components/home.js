@@ -3,7 +3,6 @@ import { Switch, Route } from 'react-router-dom'
 import Head from './head'
 import Category from './category'
 import IndexComponent from './index'
-// import wave from '../assets/images/wave.jpg'
 
 const Home = () => {
 
