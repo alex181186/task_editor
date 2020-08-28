@@ -251,6 +251,7 @@ server.delete('/api/v1/tasks/:category/:id', async (req, res) => {
 
 server.get('/api/v1/categories', async (req, res) => {
   const filesName = await getDirFileName()
+  console.log(filesName)
   res.send(filesName)
 })
 
