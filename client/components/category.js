@@ -11,6 +11,7 @@ const Category = () => {
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState('')
   const [statusPost, setStatusPost] = useState('')
+  const [reloadTask, setReloadTask] = useState(false)
   
   async function fetchComment(nTask, naskCategory) {
     // You can await here
@@ -22,8 +23,8 @@ const Category = () => {
       }
   }
 
-  async function fetchTasks(naskCategory) {
-    const tasksGetting = await axios.get(`/api/v1/tasks/${naskCategory}`)
+  async function fetchTasks(taskCategory) {
+    const tasksGetting = await axios.get(`/api/v1/tasks/${taskCategory}`)
       .then(({ data }) => data)
     await  setTasks(tasksGetting)
   }
@@ -35,7 +36,7 @@ const Category = () => {
 
   useEffect( () => {
     fetchTasks(category)
-  }, [category, statusPost])
+  }, [category, statusPost, reloadTask])
 
   return (
     <div className="category">
@@ -48,7 +49,9 @@ const Category = () => {
         <AddTask setNewTask={setNewTask} category={category}/>
         <div className="task-info">
           {tasks.map( task => {
-            return <Task key={task.taskId} title={task.title} taskId={task.taskId} />
+            return <Task key={task.taskId} title={task.title} category={category} 
+              taskId={task.taskId} taskStatus={task.status} setReloadTask={setReloadTask} 
+              reloadTask={reloadTask}/>
           })}
         </div>
       </div>

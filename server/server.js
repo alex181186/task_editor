@@ -221,15 +221,15 @@ server.get('/api/v1/tasks/:category', async (req, res) => {
 
 server.patch('/api/v1/tasks/:category/:id', async (req, res) => {
   const body = await req.body
-  const status = await body.status
-  if (!statusEnableList.includes(status)) {
+  const statusTask = await body.status
+  if (!statusEnableList.includes(statusTask)) {
     res.status(501)
     res.send({ status: 'error', message: 'incorrect status' })
     return
   }
   const { category, id } = await req.params
   const tasks = await getTasks(category)
-  const upTasks = setStatusTask(tasks, id, status)
+  const upTasks = setStatusTask(tasks, id, statusTask)
   const task = await getNewTaskById(upTasks, id)
   if (typeof task === 'undefined') {
     res.status(501)
