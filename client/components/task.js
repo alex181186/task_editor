@@ -5,23 +5,49 @@ const Task = (props) => {
 
   const [isNew, setIsNew] = useState(false)
   const [isInProgress, setIsInProgress] = useState(false)
+  const [isBlocked, setIsBlocked] = useState(false)
 
   useEffect(() => {
     if (props.taskStatus === 'new') {
       setIsNew(true)
     } else if (props.taskStatus === 'in progress') {
       setIsInProgress(true)
-    }
+    } else if (props.taskStatus === 'blocked') {
+      setIsBlocked(true)
+    } 
   }, [props.taskStatus])
 
   async function newButtonClick () {
     await axios.patch(
       `/api/v1/tasks/${props.category}/${props.taskId}`, {'status': 'in progress'})
-      .catch(err => console.log(err))
+      // .catch(err => console.log(err))
     await props.setReloadTask(!props.reloadTask)
     await setIsNew(false)
   }
   
+  async function blockedButtonClick () {
+    if (props.taskStatus === 'in progress') {
+      await axios.patch(
+        `/api/v1/tasks/${props.category}/${props.taskId}`, {'status': 'blocked'})
+        // .catch(err => console.log(err))
+      await setIsInProgress(false)
+    } else if (props.taskStatus === 'blocked') {
+      await axios.patch(
+        `/api/v1/tasks/${props.category}/${props.taskId}`, {'status': 'in progress'})
+        // .catch(err => console.log(err))
+      await setIsBlocked(false)
+    }
+    await props.setReloadTask(!props.reloadTask)
+    // await setIsNew(false)
+  }
+
+  async function doneButtonClick () {
+    await axios.patch(
+      `/api/v1/tasks/${props.category}/${props.taskId}`, {'status': 'done'})
+      // .catch(err => console.log(err))
+    await props.setReloadTask(!props.reloadTask)
+    await setIsInProgress(false)
+  }
 
   console.log(props)
   console.log(isNew)
@@ -35,18 +61,18 @@ const Task = (props) => {
             in progress
           </button>
         </div>}
-        {isInProgress && <div className="flex">
-          <div className="w-auto px-2 flex flex-shrink-0">
-            <button type="button" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
+        <div className="flex">
+          {(isBlocked || isInProgress) && <div className="w-auto px-2 flex flex-shrink-0">
+            <button type="button" onClick={blockedButtonClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
               blocked
             </button>
-          </div>
-          <div className="w-auto px-2 flex flex-shrink-0">
-            <button type="button" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
+          </div>}
+          {isInProgress && <div className="w-auto px-2 flex flex-shrink-0">
+            <button type="button" onClick={doneButtonClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
               done
             </button>
-          </div>
-        </div>}
+          </div>}
+        </div>
       </div>
     </div>
   )

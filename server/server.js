@@ -129,6 +129,7 @@ const setDeleteTask = (tasks, id) => {
 const saveTasks = async (category, task) => {
   // const fullTask = {...task, ['_isDeleted']: false, [status]: 'new', ['_createdAt']: +new Date(), ['_deletedAt']: null}
   const newTask = task
+  newTask.taskId = shortid.generate()
   newTask.status = 'new'
   newTask['_isDeleted'] = false
   newTask['_createdAt'] = +new Date()
