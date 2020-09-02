@@ -2,7 +2,6 @@ import React from 'react'
 
 
 const AddTask = (props) => {
-  // const [value, setValue] = useState('')
 
   async function handleClick () {
     await props.setNewTask(props.inputTaskTitle)
@@ -11,8 +10,8 @@ const AddTask = (props) => {
 
   const onChange = (e) => {
     props.setInputTaskTitle(e.target.value)
-    props.setNewEditTask(e.target.value)
-    console.log('add-task.inputValue: ', props.inputTaskTitle)
+    // props.setNewEditTask(e.target.value)
+    console.log('add-task.inputTaskTitle: ', props.inputTaskTitle)
   }
 
 

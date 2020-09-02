@@ -60,10 +60,11 @@ const Task = (props) => {
 
   async function saveClick () {
     await axios.patch(
-      `/api/v1/tasks/${props.category}/${props.taskId}`, {'title': props.newEditTask})
+      `/api/v1/tasks/${props.category}/${props.taskId}`, {'title': props.inputTaskTitle})
     await setSaveEditTask(!saveEditTask)
     await props.setReloadTask(!props.reloadTask)
     await setEditToSave(!editToSave)
+    await props.setInputTaskTitle('')
   }
 
 
