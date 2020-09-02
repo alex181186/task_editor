@@ -10,8 +10,17 @@ const AddTask = (props) => {
   }
 
   const onChange = (e) => {
-    setValue(e.target.value)
+    if (props.inputTaskTitle !== '') {
+      setValue(props.inputTaskTitle)
+      props.setInputTaskTitle('')
+    } else{
+      setValue(e.target.value)
+      props.setNewEditTask(e.target.value)
+
+    }
+    console.log('add-task.inputValue: ', value)
   }
+
 
   return (
     <div>

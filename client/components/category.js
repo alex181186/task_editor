@@ -12,6 +12,10 @@ const Category = () => {
   const [newTask, setNewTask] = useState('')
   const [statusPost, setStatusPost] = useState('')
   const [reloadTask, setReloadTask] = useState(false)
+  // New task value after editing
+  const [newEditTask, setNewEditTask] = useState('')
+  // value to set in the input field in add-task
+  const [inputTaskTitle, setInputTaskTitle] = useState('')
   
   async function fetchComment(nTask, naskCategory) {
     // You can await here
@@ -46,12 +50,13 @@ const Category = () => {
             <div className="content__category-name text-center text-xl">Task category: {category}</div>
           </div>
         </div>
-        <AddTask setNewTask={setNewTask} category={category}/>
+        <AddTask setNewTask={setNewTask} category={category} setNewEditTask={setNewEditTask}
+          inputTaskTitle={inputTaskTitle} setInputTaskTitle={setInputTaskTitle} />
         <div className="task-info">
           {tasks.map( task => {
             return <Task key={task.taskId} title={task.title} category={category} 
               taskId={task.taskId} taskStatus={task.status} setReloadTask={setReloadTask} 
-              reloadTask={reloadTask}/>
+              reloadTask={reloadTask} setInputTaskTitle={setInputTaskTitle} newEditTask={newEditTask}/>
           })}
         </div>
       </div>

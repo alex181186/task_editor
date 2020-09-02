@@ -6,6 +6,8 @@ const Task = (props) => {
   const [isNew, setIsNew] = useState(false)
   const [isInProgress, setIsInProgress] = useState(false)
   const [isBlocked, setIsBlocked] = useState(false)
+  const [editToSave, setEditToSave] = useState(false)
+  const [saveEditTask, setSaveEditTask] = useState(false)
 
   useEffect(() => {
     if (props.taskStatus === 'new') {
@@ -49,30 +51,55 @@ const Task = (props) => {
     await setIsInProgress(false)
   }
 
+  // setInputValue
+  async function editClick () {
+    await props.setInputTaskTitle(props.title)
+    await setEditToSave(!editToSave)
+    console.log('props.title: ', props.title)
+  }
+
+  async function saveClick () {
+    await axios.patch(
+      `/api/v1/tasks/${props.category}/${props.taskId}`, {'title': props.newEditTask})
+    await setSaveEditTask(!saveEditTask)
+    await props.setReloadTask(!props.reloadTask)
+    await setEditToSave(!editToSave)
+  }
+
+
   console.log(props)
   console.log(isNew)
 
   return (
-    <div className="flex w-full p-1 px-2 bg-gray-100">
-      <div className="w-full bg-blue-200 py-2 px-4 rounded">{props.title}</div>
-      <div className="flex">
+    <div className="flex w-full p-2 bg-gray-100">
+      <div className="w-4/5 bg-blue-200 px-2 rounded">{props.title}</div>
+      <div className="w-1/5 bg-blue-200  mx-2 rounded">{props.taskStatus}</div>
+      <div className="flex px-2">
+        {!editToSave && <div className="w-auto px-2 flex flex-shrink-0">
+          <button type="button" onClick={editClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
+            edit
+          </button>
+        </div>}
+        {editToSave && <div className="w-auto px-2 flex flex-shrink-0">
+          <button type="button" onClick={saveClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
+            save
+          </button>
+        </div>}
         {isNew && <div className="w-auto px-2 flex flex-shrink-0">
           <button type="button" onClick={newButtonClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
             in progress
           </button>
         </div>}
-        <div className="flex">
-          {(isBlocked || isInProgress) && <div className="w-auto px-2 flex flex-shrink-0">
-            <button type="button" onClick={blockedButtonClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
-              blocked
-            </button>
-          </div>}
-          {isInProgress && <div className="w-auto px-2 flex flex-shrink-0">
-            <button type="button" onClick={doneButtonClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
-              done
-            </button>
-          </div>}
-        </div>
+        {(isBlocked || isInProgress) && <div className="w-auto px-2 flex flex-shrink-0">
+          <button type="button" onClick={blockedButtonClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
+            blocked
+          </button>
+        </div>}
+        {isInProgress && <div className="w-auto px-2 flex flex-shrink-0">
+          <button type="button" onClick={doneButtonClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded">
+            done
+          </button>
+        </div>}
       </div>
     </div>
   )

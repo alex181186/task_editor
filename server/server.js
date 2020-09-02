@@ -104,6 +104,7 @@ const getNewTaskById = (tasks, id) => {
   return taskID[0]
 }
 
+/*
 const setStatusTask = (tasks, id, status) => {
   const upTasks = tasks.map((task) => {
     const newTask = task
@@ -111,6 +112,18 @@ const setStatusTask = (tasks, id, status) => {
       newTask.status = status
     }
     return newTask
+  })
+  return upTasks
+}
+*/
+
+const SetNewTask = (tasks, id, updateData) => {
+  const upTasks = tasks.map((task) => {
+    if (task.taskId === id) {
+      const newTask = {...task, ...updateData}
+      return newTask
+    }
+    return task
   })
   return upTasks
 }
@@ -220,17 +233,24 @@ server.get('/api/v1/tasks/:category', async (req, res) => {
   res.send(tasksUndeleted)
 })
 
+
+
+
+
 server.patch('/api/v1/tasks/:category/:id', async (req, res) => {
   const body = await req.body
-  const statusTask = await body.status
-  if (!statusEnableList.includes(statusTask)) {
-    res.status(501)
-    res.send({ status: 'error', message: 'incorrect status' })
+  if (body.status) {
+    if (!statusEnableList.includes(body.status)) {
+      res.status(501)
+      res.send({ status: 'error', message: 'incorrect status' })
     return
+    }
   }
   const { category, id } = await req.params
   const tasks = await getTasks(category)
-  const upTasks = setStatusTask(tasks, id, statusTask)
+  // const statusTask = body.status
+  // const upTasks = setStatusTask(tasks, id, statusTask)
+  const upTasks = SetNewTask(tasks, id, body)
   const task = await getNewTaskById(upTasks, id)
   if (typeof task === 'undefined') {
     res.status(501)
@@ -240,6 +260,12 @@ server.patch('/api/v1/tasks/:category/:id', async (req, res) => {
   await saveFile(upTasks, category)
   res.send(task)
 })
+
+
+
+
+
+
 
 server.delete('/api/v1/tasks/:category/:id', async (req, res) => {
   const { category, id } = await req.params
