@@ -4,6 +4,7 @@ import axios from 'axios'
 import './category.scss'
 import Task from './task'
 import AddTask from './add-task'
+import TimeChoiceMenu from './time-choice-menu'
 
 const Category = () => {
   const { category } = useParams()
@@ -16,7 +17,6 @@ const Category = () => {
   const [inputTaskTitle, setInputTaskTitle] = useState('')
   
   async function fetchComment(nTask, naskCategory) {
-    // You can await here
     if (nTask) {
       await axios.post(`/api/v1/tasks/${naskCategory}`, {'title': nTask})
         .then(res => console.log(res))
@@ -47,6 +47,9 @@ const Category = () => {
           <div className="flex-1 bg-gray-500 h-12">
             <div className="content__category-name text-center text-xl">Task category: {category}</div>
           </div>
+        </div>
+        <div>
+          <TimeChoiceMenu setReloadTask={setReloadTask} setTasks={setTasks} category={category} /> 
         </div>
         <AddTask setNewTask={setNewTask} category={category} 
           inputTaskTitle={inputTaskTitle} setInputTaskTitle={setInputTaskTitle} />

@@ -33,9 +33,9 @@ class Task {
 */
 
 const periodOfTime = {
-  day: 1000 * 60 * 60 * 24,
-  week: 7 * 1000 * 60 * 60 * 24,
-  month: 30 * 1000 * 60 * 60 * 24
+  'day': 1000 * 60 * 60 * 24,
+  'week': 7 * 1000 * 60 * 60 * 24,
+  'month': 30 * 1000 * 60 * 60 * 24
 }
 
 const statusEnableList = ['done', 'new', 'in progress', 'blocked']
